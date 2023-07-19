@@ -18,9 +18,11 @@ import android.view.KeyEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import androidx.lifecycle.Lifecycle;
 import androidx.test.annotation.UiThreadTest;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.Espresso;
+import androidx.test.espresso.action.ViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.SdkSuppress;
@@ -30,6 +32,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.annotation.Config;
+import org.robolectric.annotation.GraphicsMode;
 import org.robolectric.integration.axt.R;
 
 /** Simple tests to verify espresso APIs can be used on both Robolectric and device. */
@@ -221,6 +224,31 @@ public final class EspressoTest {
       onView(withId(R.id.scroll_view)).perform(swipeUp());
       onView(withId(R.id.button)).perform(click());
       activityScenario.onActivity(action -> assertThat(action.buttonClicked).isTrue());
+    }
+  }
+
+  @Test
+  public void focusButton_after_DpadDown() {
+    activityRule.getScenario().moveToState(Lifecycle.State.DESTROYED);
+    try (ActivityScenario<EspressoFocusableActivity> activityScenario =
+             ActivityScenario.launch(EspressoFocusableActivity.class)) {
+      onView(withId(R.id.scroll_view)).perform(ViewActions.pressKey(KeyEvent.KEYCODE_DPAD_DOWN));
+      onView(withId(R.id.scroll_view)).perform(ViewActions.pressKey(KeyEvent.KEYCODE_DPAD_DOWN));
+      activityScenario.onActivity(activity -> assertThat(activity.findViewById(R.id.button).isFocused()).isFalse());
+      activityScenario.onActivity(activity -> assertThat(activity.findViewById(R.id.button2).isFocused()).isTrue());
+    }
+  }
+
+  @GraphicsMode(GraphicsMode.Mode.NATIVE)
+  @Test
+  public void focusNativeButton_after_DpadDown() {
+    activityRule.getScenario().moveToState(Lifecycle.State.DESTROYED);
+    try (ActivityScenario<EspressoFocusableActivity> activityScenario =
+             ActivityScenario.launch(EspressoFocusableActivity.class)) {
+      onView(withId(R.id.scroll_view)).perform(ViewActions.pressKey(KeyEvent.KEYCODE_DPAD_DOWN));
+      onView(withId(R.id.scroll_view)).perform(ViewActions.pressKey(KeyEvent.KEYCODE_DPAD_DOWN));
+      activityScenario.onActivity(activity -> assertThat(activity.findViewById(R.id.button).isFocused()).isFalse());
+      activityScenario.onActivity(activity -> assertThat(activity.findViewById(R.id.button2).isFocused()).isTrue());
     }
   }
 }
