@@ -34,6 +34,24 @@ android {
     testOptions {
         unitTests {
             includeAndroidResources = true
+            all {
+                // For roborazzi users, Please use Roborazzi plugin and gradle.properties instead of this.
+                // https://takahirom.github.io/roborazzi/how-to-use.html#roborazzi-gradle-properties-options
+
+                // `roborazzi.test` options determines Roborazzi's behavior.
+                // record: Record screenshots
+                // verify: Verify screenshots
+
+                // If we use both,
+                // Roborazzi will verify new screenshots with existing screenshots
+                // and record new screenshots.
+                systemProperty 'roborazzi.test.record', 'true'
+                systemProperty 'roborazzi.test.verify', 'true'
+
+                // Change naming strategy of screenshots.
+                // org.robolectric.....RoborazziCaptureTest.checkDialogRendering.png -> RoborazziCaptureTest.checkDialogRendering.png
+                systemProperty 'roborazzi.record.namingStrategy', 'testClassAndMethod'
+            }
         }
     }
 }
@@ -44,4 +62,5 @@ dependencies {
     testImplementation libs.junit4
     testImplementation libs.truth
     testImplementation libs.roborazzi
+    testImplementation libs.roborazzi.rule
 }
