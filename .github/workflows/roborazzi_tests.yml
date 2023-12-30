@@ -1,4 +1,4 @@
-name: Graphics Tests
+name: Roborazzi Integration Tests
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
       - '**.md'
 
 permissions:
-  contents: read
+  contents: write # for uploading screenshots
 
 jobs:
   graphics_tests:
@@ -30,6 +30,8 @@ jobs:
       - uses: gradle/gradle-build-action@v2.11.0
 
       - name: Run unit tests
+        id: roborazziverify
+        continue-on-error: true
         run: |
           SKIP_ERRORPRONE=true SKIP_JAVADOC=true ./gradlew :integration_tests:roborazzi:verifyRoborazziDebug \
           --info --stacktrace --continue \
@@ -37,6 +39,33 @@ jobs:
           --no-watch-fs \
           -Drobolectric.alwaysIncludeVariantMarkersInTestName=true \
           -Dorg.gradle.workers.max=2
+
+      - name: Prevent pushing new screenshots if this is a fork
+        id: checkfork
+        continue-on-error: false
+        if: steps.roborazziverify.outcome == 'failure' && github.event.pull_request.head.repo.full_name != github.repository
+        run: |
+          echo "::error::Screenshot tests failed, please create a PR in your fork first." && exit 1
+
+        # Runs if previous job failed
+      - name: Generate new screenshots if verification failed and it's a PR
+        id: roborazzirecord
+        if: steps.roborazziverify.outcome == 'failure' && github.event_name == 'pull_request'
+        run: |
+          SKIP_ERRORPRONE=true SKIP_JAVADOC=true ./gradlew :integration_tests:roborazzi:recordRoborazziDebug \
+          --info --stacktrace --continue \
+          --parallel \
+          --no-watch-fs \
+          -Drobolectric.alwaysIncludeVariantMarkersInTestName=true \
+          -Dorg.gradle.workers.max=2
+
+      - name: Push new screenshots if available
+        uses: stefanzweifel/git-auto-commit-action@v5
+        if: steps.roborazzirecord.outcome == 'success'
+        with:
+          file_pattern: '*/*.png'
+          disable_globbing: true
+          commit_message: "🤖 Updates screenshots"
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3
