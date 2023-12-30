@@ -31,7 +31,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          SKIP_ERRORPRONE=true SKIP_JAVADOC=true ./gradlew :integration_tests:roborazzi:testDebugUnitTest \
+          SKIP_ERRORPRONE=true SKIP_JAVADOC=true ./gradlew :integration_tests:roborazzi:verifyRoborazziDebug \
           --info --stacktrace --continue \
           --parallel \
           --no-watch-fs \
