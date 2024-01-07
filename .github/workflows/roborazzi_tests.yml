@@ -7,7 +7,7 @@ on:
       - '**.md'
 
   pull_request:
-    branches: [ master, google ]
+#    branches: [ master, google ]
     paths-ignore:
       - '**.md'
 
@@ -16,7 +16,10 @@ permissions:
 
 jobs:
   roborazzi_tests:
-    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        device: [ macos-12, ubuntu-22.04, self-hosted ]
+    runs-on: ${{ matrix.device }}
 
     steps:
       - uses: actions/checkout@v4

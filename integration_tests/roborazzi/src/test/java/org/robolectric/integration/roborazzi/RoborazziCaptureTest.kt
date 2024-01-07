@@ -17,7 +17,8 @@ import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.RoborazziOptions
 import com.github.takahirom.roborazzi.RoborazziRule
 import com.github.takahirom.roborazzi.captureScreenRoboImage
-import kotlin.reflect.KClass
+import com.github.takahirom.roborazzi.roboOutputName
+import com.google.common.base.StandardSystemProperty
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,6 +26,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
+import kotlin.reflect.KClass
 
 /**
  * Integration Test for Roborazzi
@@ -86,7 +88,10 @@ class RoborazziCaptureTest {
   }
 
   private fun captureScreenWithRoborazzi() {
-    captureScreenRoboImage()
+    val properties = System.getProperties()
+    val os: String = properties.getProperty(StandardSystemProperty.OS_NAME.key(), "").lowercase()
+    val arch: String = properties.getProperty(StandardSystemProperty.OS_ARCH.key(), "").lowercase()
+    captureScreenRoboImage(filePath = "${roboOutputName()}_${os}_${arch}.png")
   }
 
   companion object {
