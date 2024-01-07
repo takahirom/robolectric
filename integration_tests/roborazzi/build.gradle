@@ -42,6 +42,9 @@ android {
                 // Change naming strategy of screenshots.
                 // org.robolectric.....RoborazziCaptureTest.checkDialogRendering.png -> RoborazziCaptureTest.checkDialogRendering.png
                 systemProperty 'roborazzi.record.namingStrategy', 'testClassAndMethod'
+
+                // Use RoborazziRule's base path when you use captureRoboImage(path).
+                systemProperty 'roborazzi.record.filePathStrategy', 'relativePathFromRoborazziContextOutputDirectory'
             }
         }
     }
