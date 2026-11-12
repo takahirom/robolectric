@@ -34,4 +34,5 @@ dependencies {
   testImplementation(libs.truth)
   testImplementation(libs.junit4)
   testImplementation(libs.guava.testlib)
+  testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:1.11.0")
 }
